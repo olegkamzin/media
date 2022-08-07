@@ -9,7 +9,6 @@ class ImagesController {
 		const sizes = [200, 400, 800, null]
 		const dir = genName(2) + '/'
 		const result = []
-		console.log(req)
 		if (Array.isArray(img)) {
 			for (const el of img) {
 				const name = dir + genName(16) + '.webp'
@@ -20,7 +19,7 @@ class ImagesController {
 					if (!fs.existsSync(imgDir)) fs.mkdirSync(imgDir)
 					sharp(el.data)
 						.resize(sizes[i], sizes[i], { fit: 'inside' })
-						.toFile(sizeDir + name, (err, info) => { console.log(info) })
+						.toFile(sizeDir + name)
 				}
 				result.push(name)
 			}
@@ -33,7 +32,7 @@ class ImagesController {
 				if (!fs.existsSync(imgDir)) fs.mkdirSync(imgDir)
 				sharp(img.data)
 					.resize(sizes[i], sizes[i], { fit: 'inside' })
-					.toFile(sizeDir + name, (err, info) => { console.log(info) })
+					.toFile(sizeDir + name)
 			}
 			result.push(name)
 	
