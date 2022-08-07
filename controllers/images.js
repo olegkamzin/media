@@ -5,32 +5,45 @@ import sharp from 'sharp'
 
 class ImagesController {
 	async upload(req, res, next) {
-		// fs.mkdirSync('static/' + (new Date()).getFullYear())
-		const { slug } = req.params
 		const { img } = req.files
+		const sizes = [200, 400, 800, null]
+		const dir = genName(2) + '/'
+		const result = []
+		console.log(req)
 		if (Array.isArray(img)) {
 			for (const el of img) {
-				console.log(el)
-				const name = uuidv4() + '.webp'
-				sharp(el.data)
-					.webp()
-				// el.mv(path.resolve('static/' + el.name))
+				const name = dir + genName(16) + '.webp'
+				for (let i = 0; i < sizes.length; i++) {
+					const sizeDir = 'static/' + sizes[i] + '/'
+					if (!fs.existsSync(sizeDir)) fs.mkdirSync(sizeDir)
+					const imgDir = sizeDir + dir
+					if (!fs.existsSync(imgDir)) fs.mkdirSync(imgDir)
+					sharp(el.data)
+						.resize(sizes[i], sizes[i], { fit: 'inside' })
+						.toFile(sizeDir + name, (err, info) => { console.log(info) })
+				}
+				result.push(name)
 			}
 		} else {
-			const name = gen_name(12) + '.webp'
-			console.log(name)
-			sharp(img.data)
-				.toFile('static/2022/' + name, (err, info) => { console.log(info) })
-			sharp(img.data)
-				.resize(300, 300, { fit: 'inside' })
-				.toFile('static/2022/' + '300-' + name, (err, info) => { console.log(info) })
-			res.json(name)
+			const name = dir + genName(16) + '.webp'
+			for (let i = 0; i < sizes.length; i++) {
+				const sizeDir = 'static/' + sizes[i] + '/'
+				if (!fs.existsSync(sizeDir)) fs.mkdirSync(sizeDir)
+				const imgDir = sizeDir + dir
+				if (!fs.existsSync(imgDir)) fs.mkdirSync(imgDir)
+				sharp(img.data)
+					.resize(sizes[i], sizes[i], { fit: 'inside' })
+					.toFile(sizeDir + name, (err, info) => { console.log(info) })
+			}
+			result.push(name)
+	
 		}
+		res.json(result)
 	}
 }
 
-const gen_name = (len) => {
-	const abc = 'abdehkmnpswxzABDEFGHKMNPQRSTWXZ123456789'
+const genName = (len) => {
+	const abc = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789'
 	let str = ''
 	for (let i = 0; i < len; i++) {
 		const pos = Math.floor(Math.random() * abc.length)
